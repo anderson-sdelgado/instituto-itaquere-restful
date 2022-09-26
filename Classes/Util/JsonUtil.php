@@ -30,4 +30,14 @@ class JsonUtil
         return $postJson;
     }
 
+    public static function tratarListVideo()
+    {
+        try{
+            $postJson = json_decode($_REQUEST['videoserver'], true);
+        } catch (Exception $exception){
+            throw new Exception($exception->getMessage(), 404);
+        }
+        return $postJson;
+    }
+
 }

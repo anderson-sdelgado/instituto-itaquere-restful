@@ -7,6 +7,24 @@ use Exception;
 class FileUtil
 {
 
+    public static function hasImage(){
+        if(isset($_FILES['image']) && !empty($_FILES['image'])){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public static function hasDocument(){
+        if(isset($_FILES['document']) && !empty($_FILES['document'])){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
     public static function updateImage($codigo)
     {
 
@@ -58,24 +76,6 @@ class FileUtil
 
     }
 
-    public static function hasImage(){
-        if(isset($_FILES['image']) && !empty($_FILES['image'])){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    public static function hasDocument(){
-        if(isset($_FILES['document']) && !empty($_FILES['document'])){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
     public static function updateGallery($codigo, $codGaleira)
     {
 
@@ -96,6 +96,34 @@ class FileUtil
                         throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE, 404);
                     } else {
                         $gallery[] = array("image" => $name, "cod_noticia" => $codigo);
+                    }
+                    $codGaleira++;
+                }
+            }
+            return $gallery;
+        } catch (Exception $exception){
+            throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE, 404);
+        }
+
+    }
+
+    public static function updateVideo($codigo, $codGaleira)
+    {
+
+        try{
+            $gallery = array();
+            foreach ($_FILES as $key => $values) {
+                if(str_contains($key, 'video')){
+                    if($values['type'] === 'video/mp4'){
+                        $name = 'noticia' . $codigo . '-video' . $codGaleira . '.mp4';
+                    }
+                    else{
+                        throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE_TIPO, 404);
+                    }
+                    if (!move_uploaded_file($values['tmp_name'], DIR_IMG . $name)) {
+                        throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE, 404);
+                    } else {
+                        $gallery[] = array("video" => $name, "cod_noticia" => $codigo);
                     }
                     $codGaleira++;
                 }

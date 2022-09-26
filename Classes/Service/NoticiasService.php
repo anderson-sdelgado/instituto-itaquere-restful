@@ -5,6 +5,7 @@ namespace Service;
 use Util\ConstantesGenericasUtil;
 use Repository\NoticiasRepository;
 use Repository\GaleriaNoticiaRepository;
+use Repository\VideoNoticiaRepository;
 use Util\FileUtil;
 use Util\JsonUtil;
 
@@ -19,15 +20,26 @@ class NoticiasService
         $retorno = [];
         $this->NoticiasRepository = new NoticiasRepository();
         $this->GaleriaNoticiaRepository = new GaleriaNoticiaRepository();
+        $this->VideoNoticiaRepository = new VideoNoticiaRepository();
+
         $codLast = $this->NoticiasRepository->codLast();
         $codigo = $codLast[0]['codigo'];
         $capa = FileUtil::updateImage($codigo);
+
         $codLast = $this->GaleriaNoticiaRepository->codLast();
         $codGaleira = $codLast[0]['codigo'];
         $galeria = FileUtil::updateGallery($codigo, $codGaleira);
         foreach ($galeria as $values) {
             $this->GaleriaNoticiaRepository->insert($values);
         }
+
+        $codLast = $this->VideoNoticiaRepository->codLast();
+        $codVideo = $codLast[0]['codigo'];
+        $videos = FileUtil::updateVideo($codigo, $codVideo);
+        foreach ($videos as $values) {
+            $this->VideoNoticiaRepository->insert($values);
+        }
+        
         $dados['capa'] = $capa;
         $retorno[ConstantesGenericasUtil::RESPONSE] = $this->NoticiasRepository->insert($dados);
         return $retorno;
@@ -37,6 +49,8 @@ class NoticiasService
         $retorno = [];
         $this->NoticiasRepository = new NoticiasRepository();
         $this->GaleriaNoticiaRepository = new GaleriaNoticiaRepository();
+        $this->VideoNoticiaRepository = new VideoNoticiaRepository();
+
         $noticia = $this->getOneByKey($codigo);
         if(FileUtil::hasImage()){
             FileUtil::deleteFile($noticia['capa']);
@@ -46,6 +60,8 @@ class NoticiasService
         else{
             unset($dados['capa']);
         }
+
+
         $galeriaBD = $this->GaleriaNoticiaRepository->getPorCodNoticia($codigo);
         $galeriaRet = JsonUtil::tratarListImage();
         foreach ($galeriaBD as $imgBD) {
@@ -66,6 +82,28 @@ class NoticiasService
         foreach ($galeria as $values) {
             $this->GaleriaNoticiaRepository->insert($values);
         }
+
+        $galVideoBD = $this->VideoNoticiaRepository->getPorCodNoticia($codigo);
+        $galVideoRet = JsonUtil::tratarListVideo();
+        foreach ($galVideoBD as $videoBD) {
+            $verif = true;
+            foreach ($galVideoRet as $videoRet) {
+                if($videoBD['codigo'] === $videoRet['codigo']){
+                    $verif = false;
+                }
+            }
+            if($verif){
+                FileUtil::deleteFile($videoBD['video']);
+                $this->VideoNoticiaRepository->delete($videoBD['codigo']);
+            }
+        }
+        $codLast = $this->VideoNoticiaRepository->codLast();
+        $codVideo = $codLast[0]['codigo'];
+        $video = FileUtil::updateGallery($codigo, $codVideo);
+        foreach ($video as $values) {
+            $this->VideoNoticiaRepository->insert($values);
+        }
+
         $retorno[ConstantesGenericasUtil::RESPONSE] = $this->NoticiasRepository->update($dados, $codigo);
         return $retorno;
     }
@@ -83,11 +121,20 @@ class NoticiasService
         $retorno = [];
         $this->NoticiasRepository = new NoticiasRepository();
         $this->GaleriaNoticiaRepository = new GaleriaNoticiaRepository();
+        $this->VideoNoticiaRepository = new VideoNoticiaRepository();
+
         $galeria = $this->GaleriaNoticiaRepository->getPorCodNoticia($codigo);
         foreach ($galeria as $values) {
             FileUtil::deleteFile($values['image']);
             $this->GaleriaNoticiaRepository->delete($values['codigo']);
         }
+
+        $video = $this->VideoNoticiaRepository->getPorCodNoticia($codigo);
+        foreach ($video as $values) {
+            FileUtil::deleteFile($values['video']);
+            $this->VideoNoticiaRepository->delete($values['codigo']);
+        }
+
         $noticia = $this->getOneByKey($codigo);
         FileUtil::deleteFile($noticia['capa']);
         $retorno[ConstantesGenericasUtil::RESPONSE] = $this->NoticiasRepository->delete($codigo);

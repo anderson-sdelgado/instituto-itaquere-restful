@@ -6,6 +6,12 @@ ini_set('display_errors', 1);
 ini_set('display_startup_erros', 1);
 error_reporting(E_ERROR);
 
+// define('HOST', 'itaquere.mysql.dbaas.com.br');
+// define('BANCO', 'itaquere');
+
+// define('USER', 'itaquere');
+// define('SENHA', 'Itaquere2022');
+
 define('HOST', 'localhost');
 define('BANCO', 'itaquere');
 
