@@ -24,6 +24,7 @@ define('DIR_PROJETO', 'restful');
 
 define('DIR_IMG', DIR_APP . DS . 'img' . DS);
 define('DIR_DOC', DIR_APP . DS . 'doc' . DS);
+define('DIR_VIDEO', DIR_APP . DS . 'video' . DS);
 
 if(file_exists('autoload.php')){
     include('autoload.php');

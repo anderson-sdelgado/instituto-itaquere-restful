@@ -30,7 +30,7 @@ class DocumentoService
         $this->DocumentoRepository = new DocumentoRepository();
         $documento = $this->getOneByKey($codigo);
         if(FileUtil::hasDocument()){
-            FileUtil::deleteFile($documento['documento']);
+            FileUtil::deleteDoc($documento['documento']);
             $documento = FileUtil::updateDocument($codigo);
             $dados['documento'] = $documento;
         }
@@ -81,7 +81,7 @@ class DocumentoService
         $retorno = [];
         $this->DocumentoRepository = new DocumentoRepository();
         $documento = $this->getOneByKey($codigo);
-        FileUtil::deleteFile($documento['documento']);
+        FileUtil::deleteDoc($documento['documento']);
         $retorno[ConstantesGenericasUtil::RESPONSE] = $this->DocumentoRepository->delete($codigo);
         return $retorno;
     }

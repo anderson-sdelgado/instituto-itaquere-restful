@@ -17,6 +17,7 @@ class NoticiasService
     }
 
     public function post($dados){
+        
         $retorno = [];
         $this->NoticiasRepository = new NoticiasRepository();
         $this->GaleriaNoticiaRepository = new GaleriaNoticiaRepository();
@@ -43,9 +44,11 @@ class NoticiasService
         $dados['capa'] = $capa;
         $retorno[ConstantesGenericasUtil::RESPONSE] = $this->NoticiasRepository->insert($dados);
         return $retorno;
+
     }
 
     public function put($dados, $codigo){
+
         $retorno = [];
         $this->NoticiasRepository = new NoticiasRepository();
         $this->GaleriaNoticiaRepository = new GaleriaNoticiaRepository();
@@ -53,14 +56,13 @@ class NoticiasService
 
         $noticia = $this->getOneByKey($codigo);
         if(FileUtil::hasImage()){
-            FileUtil::deleteFile($noticia['capa']);
+            FileUtil::deleteImage($noticia['capa']);
             $capa = FileUtil::updateImage($codigo);
             $dados['capa'] = $capa;
         }
         else{
             unset($dados['capa']);
         }
-
 
         $galeriaBD = $this->GaleriaNoticiaRepository->getPorCodNoticia($codigo);
         $galeriaRet = JsonUtil::tratarListImage();
@@ -72,7 +74,7 @@ class NoticiasService
                 }
             }
             if($verif){
-                FileUtil::deleteFile($imgBD['image']);
+                FileUtil::deleteImage($imgBD['image']);
                 $this->GaleriaNoticiaRepository->delete($imgBD['codigo']);
             }
         }
@@ -93,13 +95,13 @@ class NoticiasService
                 }
             }
             if($verif){
-                FileUtil::deleteFile($videoBD['video']);
+                FileUtil::deleteVideo($videoBD['video']);
                 $this->VideoNoticiaRepository->delete($videoBD['codigo']);
             }
         }
         $codLast = $this->VideoNoticiaRepository->codLast();
         $codVideo = $codLast[0]['codigo'];
-        $video = FileUtil::updateGallery($codigo, $codVideo);
+        $video = FileUtil::updateVideo($codigo, $codVideo);
         foreach ($video as $values) {
             $this->VideoNoticiaRepository->insert($values);
         }
@@ -118,6 +120,7 @@ class NoticiasService
     }
 
     public function delete($codigo){
+
         $retorno = [];
         $this->NoticiasRepository = new NoticiasRepository();
         $this->GaleriaNoticiaRepository = new GaleriaNoticiaRepository();
@@ -125,18 +128,18 @@ class NoticiasService
 
         $galeria = $this->GaleriaNoticiaRepository->getPorCodNoticia($codigo);
         foreach ($galeria as $values) {
-            FileUtil::deleteFile($values['image']);
+            FileUtil::deleteImage($values['image']);
             $this->GaleriaNoticiaRepository->delete($values['codigo']);
         }
 
         $video = $this->VideoNoticiaRepository->getPorCodNoticia($codigo);
         foreach ($video as $values) {
-            FileUtil::deleteFile($values['video']);
+            FileUtil::deleteVideo($values['video']);
             $this->VideoNoticiaRepository->delete($values['codigo']);
         }
 
-        $noticia = $this->getOneByKey($codigo);
-        FileUtil::deleteFile($noticia['capa']);
+        $noticia = $this->NoticiasRepository->getOneByKey($codigo);
+        FileUtil::deleteImage($noticia['capa']);
         $retorno[ConstantesGenericasUtil::RESPONSE] = $this->NoticiasRepository->delete($codigo);
         return $retorno;
     }

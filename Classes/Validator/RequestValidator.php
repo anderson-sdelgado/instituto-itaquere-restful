@@ -4,7 +4,6 @@ namespace Validator;
 
 use Util\JsonUtil;
 use Util\RotasUtil;
-use Util\ConstantesGenericasUtil;
 
 class RequestValidator{
 

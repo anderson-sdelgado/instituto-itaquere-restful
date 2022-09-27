@@ -34,7 +34,7 @@ class FileUtil
                 $name = 'noticia' . $codigo . '.jpg';
             }
             else if($_FILES['image']['type'] === 'image/png'){
-                $name = 'noticia' . $codigo . 'png';
+                $name = 'noticia' . $codigo . '.png';
             }
             else{
                 throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE_TIPO, 404);
@@ -87,7 +87,7 @@ class FileUtil
                         $name = 'noticia' . $codigo . '-gallery' . $codGaleira . '.jpg';
                     }
                     else if($values['type'] === 'image/png'){
-                        $name = 'noticia' . $codigo . '-gallery' . $codGaleira . 'png';
+                        $name = 'noticia' . $codigo . '-gallery' . $codGaleira . '.png';
                     }
                     else{
                         throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE_TIPO, 404);
@@ -111,7 +111,7 @@ class FileUtil
     {
 
         try{
-            $gallery = array();
+            $video = array();
             foreach ($_FILES as $key => $values) {
                 if(str_contains($key, 'video')){
                     if($values['type'] === 'video/mp4'){
@@ -120,23 +120,37 @@ class FileUtil
                     else{
                         throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE_TIPO, 404);
                     }
-                    if (!move_uploaded_file($values['tmp_name'], DIR_IMG . $name)) {
+                    if (!move_uploaded_file($values['tmp_name'], DIR_VIDEO . $name)) {
                         throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE, 404);
                     } else {
-                        $gallery[] = array("video" => $name, "cod_noticia" => $codigo);
+                        $video[] = array("video" => $name, "cod_noticia" => $codigo);
                     }
                     $codGaleira++;
                 }
             }
-            return $gallery;
+            return $video;
         } catch (Exception $exception){
             throw new Exception(ConstantesGenericasUtil::MSG_ERR0_IMAGE, 404);
         }
 
     }
 
-    public static function deleteFile($file){
+    public static function deleteDoc($file){
         $localFile = DIR_DOC . $file;
+        if (file_exists($localFile) && !is_dir($localFile)){
+            unlink($localFile);
+        }
+    }
+
+    public static function deleteImage($file){
+        $localFile = DIR_IMG . $file;
+        if (file_exists($localFile) && !is_dir($localFile)){
+            unlink($localFile);
+        }
+    }
+
+    public static function deleteVideo($file){
+        $localFile = DIR_VIDEO . $file;
         if (file_exists($localFile) && !is_dir($localFile)){
             unlink($localFile);
         }
